@@ -1,0 +1,20 @@
+{
+
+  "manifest_version": 2,
+  "name": "(Tracking)Pixels",
+  "version": "0.1",
+  "description": "Adds some innocuous-looking pixels tn your browser... I wonder where they're coming from...",
+  "icons": {
+    "48": "icons/icon-48.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["./tracking-pixels.js"]
+    }
+  ],
+  "permissions": [
+    "storage"
+  ]
+}
