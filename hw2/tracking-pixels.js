@@ -1,21 +1,96 @@
-ad_services = [
-	"www.googleadservices.com/pagead/conversion_async.js",
-	"//connect.facebook.net/en_US/fbevents.js",
-	"https://ct.pinterest.com/v3/?tid=2612729865245&ed%5Bpage_category%5D=ProductPage&pd%5Bem%5D=314e307f8e15083b3301a74efaecda253d188121985933938657963d1ae07909&noscript=1&event=PageVisit&ed%5Bvalue%5D=207.99&ed%5Bcurrency%5D=USD&ed%5Border_quantity%5D=1&ed%5Bline_items%5D%5B0%5D%5Bproduct_name%5D=W004350489&ed%5Bline_items%5D%5B0%5D%5Bproduct_id%5D=W004350489&ed%5Bline_items%5D%5B0%5D%5Bproduct_quantity%5D=1&ed%5Bline_items%5D%5B0%5D%5Bproduct_price%5D=207.99",
-	"https://dc.ads.linkedin.com/collect/?pid=970530&fmt=gif",
-	"https://ssl.google-analytics.com/ga.js",
-	"https://www.googletagmanager.com/gtm.js?id=GTM-KGH7R8V"
-]
-var gettingStoredStats = browser.storage.local.get();
+var pastTrackers;
+var displayedPixels;
 
-function storeNote(title, body) {
-  var storingNote = browser.storage.local.set({ [title] : body });
-  storingNote.then(() => {
-    displayNote(title,body);
-  }, onError);
+var adServices = {
+    "google": ["www.googleadservices.com/pagead/conversion_async.js",
+        "www.googletagmanager.com/gtm.js",
+        "www.googletagmanager.com/gtag/js"
+    ],
+    "facebook": ["connect.facebook.net/en_US/fbevents.js"],
+    "linkedin": ["ads.linkedin.com/collect/"],
+    "reddit": ["www.redditstatic.com/ads/pixel.js"]
 }
 
-var scripts = document.getElementsByTagName('script');
-for (var i = 0; i < scripts.length; i++) { 
-	console.log(scripts[i].src) 
+function matchService(scriptSrc) {
+    for (const [company, trackers] of Object.entries(adServices)) {
+        for (const tracker of trackers) {
+            if (scriptSrc.includes(tracker)) {
+                return company
+            }
+        }
+    }
+    return undefined
+}
+
+function getTrackingScripts() {
+    var trackingCompanies = []
+    var scripts = document.getElementsByTagName('script');
+    
+    for (const script of scripts) { 
+        var match = matchService(script.src)
+        if (match != undefined) {
+            trackingCompanies.push(match);
+        }
+    }
+
+    return trackingCompanies;
+}
+
+initializeStorage();
+storeTrackingScripts();
+
+
+
+function initializeStorage() {
+    console.log("Getting past trackers")
+    pastTrackers = window.localStorage.getItem("pastTrackers")
+    displayedPixels = window.localStorage.getItem("displayedPixels")
+    if (pastTrackers == undefined) {
+        pastTrackers = {
+            "google": [],
+            "facebook": [],
+            "linkedin": [],
+            "reddit": []
+        }
+        displayedPixels = {
+            "google": [],
+            "facebook": [],
+            "linkedin": [],
+            "reddit": []
+        }
+        window.localStorage.setItem("pastTrackers", pastTrackers)
+    }
+
+}
+
+function addSite(siteInfo, company) {
+    pastTrackers[company].push(siteInfo);
+    window.localStorage.setItem("pastTrackers", pastTrackers)
+    // TODO: add pixel display/generation here such that it's stored
+    // in displayedPixels
+    // Pixel specified by color (based on company name), location s.t. no overlap
+}
+
+function storeTrackingScripts() {
+    var siteInfo = {
+        "url": window.location.href,
+        "title": document.title,
+        "image": document.querySelector("meta[property='og:image']").getAttribute('content'),
+        "description": document.querySelector("meta[property='og:description']").getAttribute('content')
+    }
+    console.log(siteInfo)
+    for (const company of getTrackingScripts()) {
+        addSite(siteInfo, company);
+    }
+
+    displayPixels(displayedPixels);
+}
+
+function displayPixels(pixels) {
+    // display pixels and make them expandable
+}
+
+function injectAds() {
+    // create pixel falling animation
+    // detect if site is reddit, google, facebook, insta
 }
