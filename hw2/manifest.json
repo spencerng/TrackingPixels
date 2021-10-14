@@ -11,10 +11,17 @@
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["./tracking-pixels.js"]
+      "js": ["tracking-pixels.js", "jquery.js"],
+      "css": ["tracking-pixels.css"]
     }
   ],
   "permissions": [
-    "storage"
-  ]
+    "storage",
+    "contextMenus",
+    "activeTab"
+  ],
+  "background": {
+    "persistent": true,
+    "scripts": ["background.js"]
+  }
 }
