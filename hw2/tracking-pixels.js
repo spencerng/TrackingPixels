@@ -53,7 +53,6 @@ async function clearStorage() {
         "twitter": [],
         "reddit": []
     }
-
     storeTrackingScripts();
 }
 
@@ -196,7 +195,7 @@ function sleep(ms) {
 async function injectAds() {
     // create pixel falling animation
     // detect if site is reddit, google, facebook, insta
-    await sleep(5000)
+    await sleep(2000)
     if (window.location.href.includes("www.google.com/search?q=")) {
         var firstResult = document.getElementsByClassName("g")[0]
 
@@ -206,6 +205,11 @@ async function injectAds() {
                 var siteInfo = pastTrackers["google"][i]
 
                 var newResult = firstResult.cloneNode(true)
+
+                while (newResult.children.length > 1) {
+                    newResult.removeChild(newResult.children[1]);
+                }
+
                 firstResult.parentNode.insertBefore(newResult, firstResult.nextSibling)
 
                 newResult.getElementsByClassName("TbwUpd NJjxre")[0].innerText = truncateURL(siteInfo.url)
