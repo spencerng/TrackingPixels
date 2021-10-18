@@ -7,7 +7,7 @@ var adServices = {
         "www.googletagmanager.com/gtm.js",
         "www.googletagmanager.com/gtag/js"
     ],
-    "facebook": ["connect.facebook.net/en_US/fbevents.js"],
+    "facebook": ["connect.facebook.net/en_US/fbevents.js", "facebook.com/tr"],
     "linkedin": ["ads.linkedin.com/collect/"],
     "reddit": ["www.redditstatic.com/ads/pixel.js"],
     "twitter": ["static.ads-twitter.com/uwt.js"]
@@ -25,16 +25,24 @@ function matchService(scriptSrc) {
 }
 
 function getTrackingScripts() {
-    var trackingCompanies = []
+    var trackingCompanies = new Set()
     var scripts = document.getElementsByTagName('script');
+    var imgs = document.getElementsByTagName('img');
 
     for (const script of scripts) {
         var match = matchService(script.src)
         if (match != undefined) {
-            trackingCompanies.push(match);
+            trackingCompanies.add(match);
         }
     }
 
+    for (const img of imgs) {
+        var match = matchService(img.src)
+        if (match != undefined) {
+            trackingCompanies.add(match);
+        }
+    }
+    console.log(trackingCompanies)
     return trackingCompanies;
 }
 
@@ -206,9 +214,6 @@ async function injectAds() {
 
                 var newResult = firstResult.cloneNode(true)
 
-                while (newResult.children.length > 1) {
-                    newResult.removeChild(newResult.children[1]);
-                }
 
                 firstResult.parentNode.insertBefore(newResult, firstResult.nextSibling)
 

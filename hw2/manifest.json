@@ -21,7 +21,7 @@
     "activeTab"
   ],
   "background": {
-    "persistent": true,
+    "persistent": false,
     "scripts": ["background.js"]
   }
 }
